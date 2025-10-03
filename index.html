@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laporan Harian Proyek</title>
+    <meta name="theme-color" content="#007BFF" />
+    <meta name="description" content="Laporan harian proyek" />
+    <link rel="manifest" href="manifest.json" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f9f9f9;
+        margin: 0;
+      }
+      .container {
+        max-width: 800px;
+        margin: auto;
+        background: white;
+        padding: 30px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        text-align: center;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      input,
+      textarea,
+      button {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .photo-container {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+      }
+      .photo-box {
+        flex: 1;
+        border: 2px solid #ddd;
+        padding: 10px;
+        text-align: center;
+      }
+      .photo-preview {
+        max-width: 100%;
+        height: auto;
+        margin-top: 10px;
+        border: 1px solid #eee;
+      }
+      .timestamp {
+        font-size: 10px;
+        color: white;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 2px 5px;
+        position: absolute;
+        bottom: 5px;
+        left: 5px;
+      }
+      .btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .btn:hover {
+        background: #0056b3;
+      }
+      #preview {
+        margin-top: 30px;
+        border: 1px solid #ccc;
+        padding: 20px;
+        background: white;
+        display: none;
+      }
+      .signature {
+        text-align: center;
+        margin-top: 30px;
+        font-weight: bold;
+        font-size: 18px;
+      }
+      .install-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 50px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>LAPORAN HARIAN PROYEK</h2>
+
+      <div class="form-group">
+        <label>HARI/TANGGAL :</label>
+        <input type="text" id="date" readonly onclick="showDatePicker()" />
+        <input
+          type="date"
+          id="datePicker"
+          style="display: none"
+          onchange="updateDate(this.value)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>JENIS PEKERJAAN :</label>
+        <textarea
+          id="jenisPekerjaan"
+          placeholder="Contoh: Rabat Bahu Jalan (Beton FC 15 MPa)"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>STA. :</label>
+        <input type="text" id="sta" placeholder="Contoh: 8+750 R - 5+875 R" />
+      </div>
+
+      <div class="form-group">
+        <label>VISUAL SEBELUM :</label>
+        <div class="photo-container">
+          <div class="photo-box">
+            <button onclick="capturePhoto('before')">
+              Ambil Foto (Kamera)
+            </button>
+            <input
+              type="file"
+              id="uploadBefore"
+              accept="image/*"
+              onchange="loadImage(this, 'before')"
+            />
+            <img
+              id="previewBefore"
+              class="photo-preview"
+              style="display: none"
+            />
+            <div
+              id="timestampBefore"
+              class="timestamp"
+              style="display: none"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>VISUAL SELESAI :</label>
+        <div class="photo-container">
+          <div class="photo-box">
+            <button onclick="capturePhoto('after')">Ambil Foto (Kamera)</button>
+            <input
+              type="file"
+              id="uploadAfter"
+              accept="image/*"
+              onchange="loadImage(this, 'after')"
+            />
+            <img
+              id="previewAfter"
+              class="photo-preview"
+              style="display: none"
+            />
+            <div
+              id="timestampAfter"
+              class="timestamp"
+              style="display: none"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>RENCANA :</label>
+        <input type="text" id="rencana" placeholder="Contoh: 12.5 M3" />
+      </div>
+
+      <div class="form-group">
+        <label>REALISASI :</label>
+        <input type="text" id="realisasi" placeholder="Contoh: 15 M3" />
+      </div>
+
+      <div class="form-group">
+        <label>DEVISASI :</label>
+        <input type="text" id="deviasi" placeholder="Contoh: 2.50 M3" />
+      </div>
+
+      <div class="form-group">
+        <label>MASALAH :</label>
+        <textarea
+          id="masalah"
+          placeholder="Deskripsikan masalah jika ada"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>PENGGUNAAN BAHAN :</label>
+        <textarea
+          id="bahan"
+          placeholder="Semen: 100 Zak\nBatu Pecah: 10.5 M3\nPasir: 6.9 M3"
+        ></textarea>
+      </div>
+
+      <button class="btn" onclick="saveDraft()">Simpan Draft</button>
+      <button class="btn" onclick="generateReport()" style="margin-left: 10px">
+        Generate PNG
+      </button>
+
+      <div id="preview"></div>
+    </div>
+
+    <button class="install-btn" id="installButton" onclick="installPWA()">
+      Install Aplikasi
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+      // Data draft
+      let draft = {
+        date: new Date().toLocaleDateString("id-ID", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+        jenisPekerjaan: "",
+        sta: "",
+        beforePhoto: null,
+        afterPhoto: null,
+        rencana: "",
+        realisasi: "",
+        deviasi: "",
+        masalah: "",
+        bahan: "",
+      };
+
+      // Load draft from localStorage
+      window.addEventListener("DOMContentLoaded", () => {
+        const saved = localStorage.getItem("dailyReportDraft");
+        if (saved) {
+          draft = JSON.parse(saved);
+          document.getElementById("date").value = draft.date;
+          document.getElementById("jenisPekerjaan").value =
+            draft.jenisPekerjaan;
+          document.getElementById("sta").value = draft.sta;
+          document.getElementById("rencana").value = draft.rencana;
+          document.getElementById("realisasi").value = draft.realisasi;
+          document.getElementById("deviasi").value = draft.deviasi;
+          document.getElementById("masalah").value = draft.masalah;
+          document.getElementById("bahan").value = draft.bahan;
+
+          if (draft.beforePhoto) {
+            const img = document.getElementById("previewBefore");
+            img.src = draft.beforePhoto;
+            img.style.display = "block";
+            document.getElementById("timestampBefore").textContent =
+              draft.beforeTimestamp || "";
+            document.getElementById("timestampBefore").style.display = "block";
+          }
+
+          if (draft.afterPhoto) {
+            const img = document.getElementById("previewAfter");
+            img.src = draft.afterPhoto;
+            img.style.display = "block";
+            document.getElementById("timestampAfter").textContent =
+              draft.afterTimestamp || "";
+            document.getElementById("timestampAfter").style.display = "block";
+          }
+        } else {
+          document.getElementById("date").value = draft.date;
+        }
+      });
+
+      function showDatePicker() {
+        document.getElementById("datePicker").style.display = "inline";
+      }
+
+      function updateDate(value) {
+        const date = new Date(value);
+        draft.date = date.toLocaleDateString("id-ID", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        document.getElementById("date").value = draft.date;
+        document.getElementById("datePicker").style.display = "none";
+        saveDraft();
+      }
+
+      async function capturePhoto(type) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+          });
+          const video = document.createElement("video");
+          video.srcObject = stream;
+          video.play();
+
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d");
+
+          video.onloadedmetadata = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                const timestamp = new Date().toLocaleString("id-ID");
+
+                context.fillStyle = "rgba(0,0,0,0.7)";
+                context.fillRect(0, canvas.height - 30, canvas.width, 30);
+                context.fillStyle = "white";
+                context.font = "12px Arial";
+                context.fillText(
+                  `Lok: ${lat.toFixed(6)}, ${lng.toFixed(6)} | ${timestamp}`,
+                  10,
+                  canvas.height - 10
+                );
+
+                const dataURL = canvas.toDataURL("image/png");
+                if (type === "before") {
+                  draft.beforePhoto = dataURL;
+                  draft.beforeTimestamp = `Lok: ${lat.toFixed(
+                    6
+                  )}, ${lng.toFixed(6)} | ${timestamp}`;
+                  document.getElementById("previewBefore").src = dataURL;
+                  document.getElementById("previewBefore").style.display =
+                    "block";
+                  document.getElementById("timestampBefore").textContent =
+                    draft.beforeTimestamp;
+                  document.getElementById("timestampBefore").style.display =
+                    "block";
+                } else {
+                  draft.afterPhoto = dataURL;
+                  draft.afterTimestamp = `Lok: ${lat.toFixed(6)}, ${lng.toFixed(
+                    6
+                  )} | ${timestamp}`;
+                  document.getElementById("previewAfter").src = dataURL;
+                  document.getElementById("previewAfter").style.display =
+                    "block";
+                  document.getElementById("timestampAfter").textContent =
+                    draft.afterTimestamp;
+                  document.getElementById("timestampAfter").style.display =
+                    "block";
+                }
+                saveDraft();
+                stream.getTracks().forEach((track) => track.stop());
+              },
+              () => {
+                const timestamp = new Date().toLocaleString("id-ID");
+                context.fillStyle = "rgba(0,0,0,0.7)";
+                context.fillRect(0, canvas.height - 30, canvas.width, 30);
+                context.fillStyle = "white";
+                context.font = "12px Arial";
+                context.fillText(`Waktu: ${timestamp}`, 10, canvas.height - 10);
+
+                const dataURL = canvas.toDataURL("image/png");
+                if (type === "before") {
+                  draft.beforePhoto = dataURL;
+                  draft.beforeTimestamp = `Waktu: ${timestamp}`;
+                  document.getElementById("previewBefore").src = dataURL;
+                  document.getElementById("previewBefore").style.display =
+                    "block";
+                  document.getElementById("timestampBefore").textContent =
+                    draft.beforeTimestamp;
+                  document.getElementById("timestampBefore").style.display =
+                    "block";
+                } else {
+                  draft.afterPhoto = dataURL;
+                  draft.afterTimestamp = `Waktu: ${timestamp}`;
+                  document.getElementById("previewAfter").src = dataURL;
+                  document.getElementById("previewAfter").style.display =
+                    "block";
+                  document.getElementById("timestampAfter").textContent =
+                    draft.afterTimestamp;
+                  document.getElementById("timestampAfter").style.display =
+                    "block";
+                }
+                saveDraft();
+                stream.getTracks().forEach((track) => track.stop());
+              }
+            );
+          };
+        } catch (err) {
+          alert("Gagal mengakses kamera: " + err.message);
+        }
+      }
+
+      function loadImage(input, type) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            const timestamp = new Date().toLocaleString("id-ID");
+            ctx.fillStyle = "rgba(0,0,0,0.7)";
+            ctx.fillRect(0, canvas.height - 30, canvas.width, 30);
+            ctx.fillStyle = "white";
+            ctx.font = "12px Arial";
+            ctx.fillText(`Waktu: ${timestamp}`, 10, canvas.height - 10);
+
+            const dataURL = canvas.toDataURL("image/png");
+            if (type === "before") {
+              draft.beforePhoto = dataURL;
+              draft.beforeTimestamp = `Waktu: ${timestamp}`;
+              document.getElementById("previewBefore").src = dataURL;
+              document.getElementById("previewBefore").style.display = "block";
+              document.getElementById("timestampBefore").textContent =
+                draft.beforeTimestamp;
+              document.getElementById("timestampBefore").style.display =
+                "block";
+            } else {
+              draft.afterPhoto = dataURL;
+              draft.afterTimestamp = `Waktu: ${timestamp}`;
+              document.getElementById("previewAfter").src = dataURL;
+              document.getElementById("previewAfter").style.display = "block";
+              document.getElementById("timestampAfter").textContent =
+                draft.afterTimestamp;
+              document.getElementById("timestampAfter").style.display = "block";
+            }
+            saveDraft();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function saveDraft() {
+        localStorage.setItem("dailyReportDraft", JSON.stringify(draft));
+        alert("Draft disimpan!");
+      }
+
+      function generateReport() {
+        const date = document.getElementById("date").value;
+        const jenisPekerjaan = document.getElementById("jenisPekerjaan").value;
+        const sta = document.getElementById("sta").value;
+        const rencana = document.getElementById("rencana").value;
+        const realisasi = document.getElementById("realisasi").value;
+        const deviasi = document.getElementById("deviasi").value;
+        const masalah = document.getElementById("masalah").value;
+        const bahan = document.getElementById("bahan").value;
+
+        const beforeImg = draft.beforePhoto
+          ? `<img src="${draft.beforePhoto}" style="max-width:100%; height:auto; margin:5px 0;">`
+          : '<div style="height:200px; background:#eee; line-height:200px; text-align:center;">No Photo</div>';
+        const afterImg = draft.afterPhoto
+          ? `<img src="${draft.afterPhoto}" style="max-width:100%; height:auto; margin:5px 0;">`
+          : '<div style="height:200px; background:#eee; line-height:200px; text-align:center;">No Photo</div>';
+
+        const preview = document.getElementById("preview");
+        preview.innerHTML = `
+                <div style="font-family:Arial; padding:30px; max-width:800px; margin:auto; border:1px solid #ccc; background:white;">
+                    <div style="font-weight:bold; font-size:18px; margin-bottom:10px;">HARI/TANGGAL : ${date}</div>
+                    <div style="font-weight:bold; font-size:16px; margin-bottom:10px;">JENIS PEKERJAAN : ${jenisPekerjaan}</div>
+                    <div style="font-weight:bold; font-size:16px; margin-bottom:10px;">STA. : ${sta}</div>
+                    <div style="font-weight:bold; font-size:16px; margin-bottom:10px;">VISUAL :</div>
+                    <table border="1" cellpadding="5" cellspacing="0" width="100%">
+                        <tr>
+                            <th style="text-align:center; font-weight:bold;">SEBELUM</th>
+                            <th style="text-align:center; font-weight:bold;">SELESAI</th>
+                        </tr>
+                        <tr>
+                            <td>${beforeImg}</td>
+                            <td>${afterImg}</td>
+                        </tr>
+                    </table>
+                    <div style="margin-top:20px;">
+                        <div style="font-weight:bold; font-size:16px; margin-bottom:5px;">RENCANA : ${rencana}</div>
+                        <div style="font-weight:bold; font-size:16px; margin-bottom:5px;">REALISASI : ${realisasi}</div>
+                        <div style="font-weight:bold; font-size:16px; margin-bottom:5px;">DEVISASI : ${deviasi}</div>
+                        <div style="font-weight:bold; font-size:16px; margin-bottom:5px;">MASALAH :</div>
+                        <div style="margin-left:20px; margin-bottom:10px;">${masalah.replace(
+                          /\n/g,
+                          "<br>"
+                        )}</div>
+                        <div style="font-weight:bold; font-size:16px; margin-bottom:5px;">PENGGUNAAN BAHAN :</div>
+                        <div style="margin-left:20px; margin-bottom:10px;">${bahan.replace(
+                          /\n/g,
+                          "<br>"
+                        )}</div>
+                    </div>
+                    <div class="signature">TERIMA KASIH</div>
+                </div>
+            `;
+        preview.style.display = "block";
+
+        html2canvas(preview).then((canvas) => {
+          const link = document.createElement("a");
+          link.download =
+            "laporan_harian_" + new Date().toISOString().split("T")[0] + ".png";
+          link.href = canvas.toDataURL("image/png");
+          link.click();
+        });
+      }
+
+      // Register Service Worker
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("sw.js")
+            .then((registration) => console.log("SW registered"))
+            .catch((err) => console.log("SW registration failed", err));
+        });
+      }
+
+      // PWA Install Logic
+      let deferredPrompt;
+      const installButton = document.getElementById("installButton");
+
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installButton.style.display = "block";
+      });
+
+      function installPWA() {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === "accepted") {
+              console.log("PWA installed");
+            }
+            deferredPrompt = null;
+            installButton.style.display = "none";
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
